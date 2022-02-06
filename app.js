@@ -11,7 +11,7 @@ var Moon                 = require("node-simaudio-moon"),
 var roon = new RoonApi({
     extension_id:        'com.guymaurier.simaudio.moon',
     display_name:        'Moon Volume/Source/Power Control',
-    display_version:     "0.1.0",
+    display_version:     "0.1.1",
     publisher:           'Guy Maurier',
     email:               'guymaurier@outlook.com',
     website:             'https://github.com/guymaurier/roon-extension-simaudio-moon',
@@ -221,11 +221,8 @@ function ev_connected(status) {
 	},
 	convenience_switch: function (req) {
 		if(this.state.status == "standby") {
-			console.log("CONVENIENCE SWITCH - STANDBY LOOP");
             control.power_on();
-            console.log("CONVENIENCE SWITCH - STANDBY LOOP 2");
             this.state.status = "selected";
-            console.log("CONVENIENCE SWITCH - STANDBY LOOP 3");
 			control.set_source(mysettings.setsource);
             
             setTimeout(() => {
@@ -235,7 +232,6 @@ function ev_connected(status) {
             req.send_complete("Success");
 		}
 		else {
-			console.log("CONVENIENCE SWITCH - ELSE LOOP");
             control.set_source(mysettings.setsource);
             
             setTimeout(() => {
@@ -246,7 +242,6 @@ function ev_connected(status) {
 		}
 	},
 	standby: function (req) {
-	    console.log("STANDBY FUNCTION");
         control.power_off();
         this.state.status = "standby";
 	    req.send_complete("Success");
@@ -281,11 +276,8 @@ function ev_source(val) {
         moon.volume_control.update_state({ is_muted: false });
     else if (val == "standby" && moon.source_control)
         moon.source_control.update_state({ status: "standby" });
-    else {
-	if (moon.volume_control)
-	    moon.volume_control.update_state({ is_muted: false });
-	moon.source_control.update_state({ status: (val == mysettings.setsource ? "selected" : "deselected") });
-    }
+    else if (val == "selected" && moon.volume_control)
+        moon.source_control.update_state({ status: "selected" });
 }
 
 setup();
