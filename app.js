@@ -11,7 +11,7 @@ var Moon                 = require("node-simaudio-moon"),
 var roon = new RoonApi({
     extension_id:        'com.guymaurier.simaudio.moon',
     display_name:        'Moon Volume/Source/Power Control',
-    display_version:     "0.1.1",
+    display_version:     "0.1.2",
     publisher:           'Guy Maurier',
     email:               'guymaurier@outlook.com',
     website:             'https://github.com/guymaurier/roon-extension-simaudio-moon',
@@ -279,7 +279,19 @@ function ev_source(val) {
     else if (val == "selected" && moon.volume_control)
         moon.source_control.update_state({ status: "selected" });
 }
+// Function implemented for Docker
+function init_signal_handlers() {
+    const handle = function(signal) {
+        process.exit(0);
+    };
+
+    // Register signal handlers to enable a graceful stop of the container
+    process.on('SIGTERM', handle);
+    process.on('SIGINT', handle);
+}
 
 setup();
+
+init_signal_handlers();
 
 roon.start_discovery();
